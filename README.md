@@ -1,3 +1,36 @@
+# GRiT Region Caption Evaluation
+
+Modified from https://github.com/JialianW/GRiT/. 
+
+## Inference
+
+### Env
+
+### VG Dataset
+- Download images from [official website](https://visualgenome.org/api/v0/api_home.html)
+- Download grit pre-processed annotations: 
+  [test.json](https://datarelease.blob.core.windows.net/grit/VG_preprocessed_annotations/test.json)
+
+### download weights
+```
+mkdir models && cd models
+wget https://datarelease.blob.core.windows.net/grit/models/grit_b_densecap_objectdet.pth
+cd ..
+```
+### Eval
+```
+python eval_grit.py
+```
+
+
+### Performance
+
+| Method | CIDEr | METEOR| SPICE | BLEU@1  | BLEU@2  | BLEU@3  | BLEU@4  | ROUGE    |
+|--------|-------|------|------|------|------|------|------|------|
+| GRiT   | 145.0 | 17.3 | 30.9 | 36.4 | 22.5 | 15.6 | 11.5 | 34.8 |
+
+
+
 # GRiT: A Generative Region-to-text Transformer for Object Understanding
 GRiT is a general and open-set object understanding framework that localizes objects and
 describes them with any style of free-form texts it was trained with, e.g., class names, descriptive sentences 
@@ -97,10 +130,27 @@ To train on single machine node, run:
 python train_deepspeed.py --num-gpus-per-machine 8 --config-file configs/GRiT_B_ObjectDet.yaml --output-dir-name ./output/grit_b_objectdet
 ~~~
 
+
 To train on multiple machine nodes, run:
 ~~~
 python train_deepspeed.py --num-machines 4 --num-gpus-per-machine 8 --config-file configs/GRiT_B_ObjectDet.yaml --output-dir-name ./output/grit_b_objectdet
 ~~~
+
+### Train without deepspeed
+
+Fix the problem of "AttributeError: module 'distutils' has no attribute 'version'" in `torch.utils.tensorboard` by `pip install setuptools==59.5.0`
+- https://github.com/pytorch/pytorch/issues/69894#issuecomment-1080635462
+
+```
+python train_net.py --num-gpus-per-machine 1 --config-file configs/GRiT_B_DenseCap.yaml --output-dir-name ./output/reimp-grit_b_densecap \
+DATALOADER.DATASET_BS 1 \
+DATALOADER.NUM_WORKERS 0
+# Original DATALOADER.DATASET_BS 2, the GPU memory takes 24G
+# from PIL import Image
+# Image.fromarray(data[0]["image"].permute(1,2,0).numpy()).save("haha.jpg")
+# [batched_inputs[0]["image"].shape] + [i.shape for i in features.values()]
+# instances.gt_boxes.nonempty()
+```
 
 ## Acknowledgement
 Our code is in part based on [Detic](https://github.com/facebookresearch/Detic),
