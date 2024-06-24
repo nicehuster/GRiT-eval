@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 filname = os.getenv("LOG_FILENAME", "region_caption.log")
 logging.basicConfig(level=logging.INFO, filename=filname, filemode="w", force=True)
 
-class PromptableGRiTInferenceEngine:
+class GRiTInferenceEngine:
     def setup_cfg(self, args):
         cfg = get_cfg()
         if args.cpu:
@@ -286,5 +286,5 @@ args.test_task = "DenseCap"
 args.cpu = False
 
 
-infer_engine = PromptableGRiTInferenceEngine(args)
+infer_engine = GRiTInferenceEngine(args)
 infer_engine.inference_dataset()
